@@ -1,0 +1,12 @@
+{
+  "name": "kripto-web-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix ./kripto-web run start",
+    "start": "npm --prefix ./kripto-web run start"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "react": "^19.2.0"
+  }
+}
