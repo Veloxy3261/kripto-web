@@ -38,9 +38,6 @@ function LoginPage() {
     const hashedUsername = CryptoJS.SHA224(username).toString();
     const hashedPassword = CryptoJS.SHA224(password).toString();
 
-    // HAPUS: await loadUsers();
-    // HAPUS: pengecekan account.some(...)
-
     try {
       // Kirim HASHED username dan HASHED password ke authContext
       // authContext akan menerimanya sebagai 'email' dan 'password'
