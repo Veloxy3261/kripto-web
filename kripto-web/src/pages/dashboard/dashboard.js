@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CryptoJS from "crypto-js"; // For AES encryption/decryption
+import CryptoJS from "crypto-js";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../../authContext";
 import "./dashboard.css";

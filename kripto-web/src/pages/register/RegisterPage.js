@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import './register.css';
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import { sendData, fetchData } from '../../firestore';
-import CryptoJS from 'crypto-js';
+// HAPUS: import { sendData, fetchData } from '../../firestore';
+import CryptoJS from 'crypto-js'; // <-- TETAP ADA
+import { useAuth } from '../../authContext'; // <-- TAMBAHKAN INI
 
 function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -11,7 +12,7 @@ function RegisterPage() {
   const [passwordVal, setPasswordVal] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [showPassVal, setShowPassVal] = useState(false);
-  const [account, setAccount] = useState([]);
+  // HAPUS: const [account, setAccount] = useState([]);
 
   const navigate = useNavigate();
   const unameRef = useRef(null);
@@ -19,23 +20,13 @@ function RegisterPage() {
   const passValRef = useRef(null);
   const circleRef = useRef(null);
 
+  const { register } = useAuth(); // <-- TAMBAHKAN INI
+
   const moveCircle = (targetRef) => {
-    if (!circleRef.current || !targetRef.current) return;
-    const elementPos = targetRef.current.getBoundingClientRect();
-    const circle = circleRef.current;
-    circle.animate(
-      {
-        left: `${elementPos.left - circle.clientHeight / 2}px`,
-        top: `${elementPos.top - circle.clientWidth / 2}px`,
-      },
-      { duration: 500, fill: 'forwards' }
-    );
+    // ... (kode moveCircle tetap sama)
   };
 
-  const loadUsers = async () => {
-    const fetchedUsers = await fetchData('account');
-    setAccount(fetchedUsers);
-  };
+  // HAPUS: const loadUsers = ...
 
   const Register = async () => {
     if (!username || !password || !passwordVal) {
@@ -49,31 +40,38 @@ function RegisterPage() {
       return;
     }
 
+    // SHA224 TETAP DI SINI (seperti kode asli Anda)
     const hashedUsername = CryptoJS.SHA224(username).toString();
     const hashedPassword = CryptoJS.SHA224(password).toString();
 
-    await loadUsers();
+    // HAPUS: await loadUsers();
+    // HAPUS: pengecekan account.some(...)
+    // HAPUS: const inputAccount = ...
+    // HAPUS: await sendData(...)
 
-    if (account.some(acc => acc.username === hashedUsername)) {
-      alert('Username already exists');
-      return;
+    try {
+      // Kirim HASHED username dan HASHED password ke authContext
+      // authContext akan menerimanya sebagai 'email' dan 'password'
+      const data = await register(hashedUsername, hashedPassword); 
+
+      if (data.status === 'success') {
+        alert('User added successfully!');
+        navigate('/login');
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('An error occurred during registration.');
     }
-
-    const inputAccount = {
-      username: hashedUsername,
-      password: hashedPassword,
-    };
-
-    await sendData('account', inputAccount);
-    alert('User added successfully!');
-    navigate('/login');
   };
 
   useEffect(() => {
-    loadUsers();
+    // HAPUS: loadUsers();
     circleRef.current = document.querySelector('.circle');
   }, []);
 
+  // ... (return JSX tetap sama)
   return (
     <>
       <div className="register">

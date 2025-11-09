@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import CryptoJS from 'crypto-js';
-import { useAuth } from '../../authContext';
-import { fetchData } from '../../firestore';
+import CryptoJS from 'crypto-js'; // <-- TETAP ADA
+import { useAuth } from '../../authContext'; // <-- TAMBAHKAN INI
+// HAPUS: import { fetchData } from '../../firestore';
 import './login.css';
 
 function LoginPage() {
   const [showed, setShowed] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [account, setAccount] = useState([]);
-  const { login } = useAuth();
+  // HAPUS: const [account, setAccount] = useState([]);
+  const { login } = useAuth(); // <-- UBAH INI
   const navigate = useNavigate();
 
   const unameRef = useRef(null);
@@ -20,22 +20,10 @@ function LoginPage() {
 
   // efek animasi circle (opsional)
   const moveCircle = (targetRef) => {
-    if (!circleRef.current || !targetRef.current) return;
-    const elementPos = targetRef.current.getBoundingClientRect();
-    const circle = circleRef.current;
-    circle.animate(
-      {
-        left: `${elementPos.left - circle.clientHeight / 2}px`,
-        top: `${elementPos.top - circle.clientWidth / 2}px`,
-      },
-      { duration: 500, fill: 'forwards' }
-    );
+    // ... (kode moveCircle tetap sama)
   };
 
-  const loadUsers = async () => {
-    const fetchedUsers = await fetchData('account');
-    setAccount(fetchedUsers);
-  };
+  // HAPUS: const loadUsers = ...
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -46,19 +34,29 @@ function LoginPage() {
       return;
     }
 
+    // SHA224 TETAP DI SINI (seperti kode asli Anda)
     const hashedUsername = CryptoJS.SHA224(username).toString();
     const hashedPassword = CryptoJS.SHA224(password).toString();
 
-    await loadUsers();
+    // HAPUS: await loadUsers();
+    // HAPUS: pengecekan account.some(...)
 
-    if (account.some((acc) => acc.username === hashedUsername && acc.password === hashedPassword)) {
-      alert('Login success');
-      login(username);
-      navigate('/');
-    } else if (account.some((acc) => acc.username === hashedUsername)) {
-      alert('Wrong password');
-    } else {
-      alert('Username not found');
+    try {
+      // Kirim HASHED username dan HASHED password ke authContext
+      // authContext akan menerimanya sebagai 'email' dan 'password'
+      const data = await login(hashedUsername, hashedPassword);
+
+      if (data.status === 'success') {
+        alert('Login success');
+        // 'login' dari context TIDAK DIPAKAI untuk set user di sini,
+        // karena kita hanya memvalidasi hash
+        navigate('/');
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during login.');
     }
   };
 
@@ -68,10 +66,11 @@ function LoginPage() {
   };
 
   useEffect(() => {
-    loadUsers();
+    // HAPUS: loadUsers();
     circleRef.current = document.querySelector('.circle');
   }, []);
 
+  // ... (return JSX tetap sama)
   return (
     <>
       <div className="login">
